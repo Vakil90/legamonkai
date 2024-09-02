@@ -45,10 +45,10 @@ export async function GET() {
                     price_data: {
                         currency: "USD",
                         product_data: {
-                            name: "LegalMonk  Pro",
+                            name: "VakilGiri  Pro",
                             description: "Unilimited Generation and Access to Exclusive Features.",
                         },
-                        unit_amount: MONTHLY_SUBSCRIPTION_FEE * 100,
+                        // unit_amount: MONTHLY_SUBSCRIPTION_FEE * 100, // for adding subcription uncomment this
                         recurring: {
                             interval: "month",
                         },

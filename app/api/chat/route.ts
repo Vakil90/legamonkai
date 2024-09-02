@@ -36,9 +36,9 @@ export async function POST(req: Request) {
             return new NextResponse("Invalid message format", { status: 400 });
         }
 
-        // Modify prompts/messages to include legal context
+        // Ensure the context is strictly about Indian law
         const legalContext = "In the context of Indian law, ";
-        const legalMessages = messages.map((message) => ({
+        const legalMessages = messages.map((message: { content: string; }) => ({
             ...message,
             content: legalContext + message.content,
         }));
@@ -88,7 +88,7 @@ export async function POST(req: Request) {
         }
 
         const response = await openai.createChatCompletion({
-            model: "gpt-3.5-turbo",
+            model: "gpt-4o", 
             messages: legalMessages,
             stream: true,
         });

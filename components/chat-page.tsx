@@ -60,14 +60,14 @@ const ChatPage = ({ initialMessages, chatId, error = false }: props) => {
         if (chatId && !pathname.includes(chatId)) {
             router.push(`/chat/${chatId}`);
         }
-    }, [chatId]);
+    }, [chatId, pathname, router]); 
 
     useEffect(() => {
         if (error) {
             toast.error("Uh oh! Unable to find chat.");
             router.push("/chat");
         }
-    }, [error]);
+    }, [error, router]);    
 
     const scrollToBottom = () => {
         window.scrollTo({
@@ -80,7 +80,7 @@ const ChatPage = ({ initialMessages, chatId, error = false }: props) => {
         if (messages[messages.length - 1]?.role === "user" || messages === initialMessages) {
             scrollToBottom();
         }
-    }, [messages]);
+    }, [messages, initialMessages]); 
 
     // Manualy Handling the onChange of propt to style the submit button
     useEffect(() => {
