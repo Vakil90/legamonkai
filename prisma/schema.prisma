@@ -1,0 +1,62 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Chat {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String
+  title            String
+  isFavourite      Boolean   @default(false)
+  isCode           Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  messageUpdatedAt DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  Message          Message[]
+  Plugin           Plugin[]
+}
+
+model Message {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  role      String
+  content   String   // Removed @db.Text since it's not supported in MongoDB
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  chatId    String   @db.ObjectId
+  chat      Chat     @relation(fields: [chatId], references: [id])
+
+  @@index([chatId])
+}
+
+model Plugin {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  type      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  chatId    String   @db.ObjectId
+  chat      Chat     @relation(fields: [chatId], references: [id])
+
+  @@index([chatId])
+}
+
+model UserApiLimit {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @unique
+  count     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserSubscription {
+  id                     String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId                 String    @unique
+  stripeCustomerId       String?   @unique @map("stripe_customer_id")
+  stripeSubscriptionId   String?   @unique @map("stripe_subscription_id")
+  stripePriceId          String?   @unique @map("stripe_price_id")
+  stripeCurrentPeriodEnd DateTime? @map("stripe_current_period_end")
+}
