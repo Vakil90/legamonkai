@@ -20,7 +20,7 @@ const Hero = () => {
                                         alt="home"
                                     /> */}
                                 </div>
-                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950 to-slate-950 rounded-lg"></div>
+                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950  rounded-lg"></div>
                             </div>
                         </div>
                     </div>
