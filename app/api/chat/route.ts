@@ -15,6 +15,12 @@ const config = new Configuration({
 
 const openai = new OpenAIApi(config);
 
+interface Message {
+    content: string;
+    role: "function" | "system" | "user" | "assistant"; // Adjust according to your needs
+    id: string; // If there are additional properties, include them here
+}
+
 export async function POST(req: Request) {
     try {
         const { userId } = auth();
@@ -38,7 +44,7 @@ export async function POST(req: Request) {
 
         // Ensure the context is strictly about Indian law
         const legalContext = "In the context of Indian law, ";
-        const legalMessages = messages.map((message: { content: string; }) => ({
+        const legalMessages = messages.map((message: Message) => ({
             ...message,
             content: legalContext + message.content,
         }));
@@ -129,3 +135,4 @@ export async function POST(req: Request) {
         return new NextResponse("Internal Server Error", { status: 500 });
     }
 }
+
