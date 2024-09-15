@@ -3,28 +3,16 @@ import SidebarHeader from "./sidebar-header";
 import { Chat as ChatType } from "@prisma/client";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 import Chat from "./chat";
+import moment from 'moment'
 
-const staticGroupedChats: { [key: string]: ChatType[] } = {
-    "September 2023": [
-        { id: "1", title: "Chat 1", createdAt: new Date(), userId: "user1", isFavourite: false, isCode: false, messageUpdatedAt: new Date(), updatedAt: new Date() },
-        { id: "2", title: "Chat 2", createdAt: new Date(), userId: "user2", isFavourite: false, isCode: false, messageUpdatedAt: new Date(), updatedAt: new Date() },
-    ],
-    "October 2023": [
-        { id: "3", title: "Chat 3", createdAt: new Date(), userId: "user3", isFavourite: false, isCode: false, messageUpdatedAt: new Date(), updatedAt: new Date() },
-    ],
-};
-
-const RecentConversations = ({ groupedChats = staticGroupedChats }: { groupedChats: { [key: string]: ChatType[] } }) => {
-    console.log('Grouped Chats:', groupedChats);
+const RecentConversations = ({ groupedChats }: { groupedChats: { [key: string]: ChatType[] } }) => {
+    
 
 
     function renderFilteredChats(chats: ChatType[], title: string) {
-        console.log('Rendering Chats for:', title, 'Chats:', chats);
         return (
             <div className="flex flex-col mb-2">
-                <AccordionTrigger className="text-xs text-indigo-300/80">
-                    {title} ({chats.length})
-                </AccordionTrigger>
+                <AccordionTrigger className="text-xs text-indigo-300/80">{title}</AccordionTrigger>
                 <AccordionContent className="space-y-2 mt-2 h-full overflow-auto pr-1">
                     {chats.map((chat) => (
                         <Chat key={chat.id} chat={chat} />
@@ -33,7 +21,6 @@ const RecentConversations = ({ groupedChats = staticGroupedChats }: { groupedCha
             </div>
         );
     }
-
 
     return (
         <div className="h-full flex flex-col mb-2 ">
@@ -49,7 +36,6 @@ const RecentConversations = ({ groupedChats = staticGroupedChats }: { groupedCha
                     </AccordionItem>
                 ))}
             </Accordion>
-
         </div>
     );
 };

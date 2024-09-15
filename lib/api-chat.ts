@@ -8,22 +8,23 @@ type Messages = {
     content: string;
 }[];
 
-export const getMessages = async (id: string): Promise<Messages> => {
+export const getMessages = async (chatId: string): Promise<Messages> => {
     const { userId } = auth();
 
-    if (!userId || !id) {
+    if (!userId || !chatId) {
         return [];
     }
 
-    // Ensure the id is a valid ObjectId string
-    if (id.length !== 24) {
+    // Ensure the chatId is a valid ObjectId string
+    if (chatId.length !== 24) {
         return [];
     }
 
+    // Fetch the chat to ensure it belongs to the current user
     const chat = await prisma.chat.findUnique({
         where: {
-            id: id,
-            userId: userId,
+            id: chatId,
+            userId: userId, // Ensures the chat belongs to the current user
         },
     });
 
@@ -31,37 +32,35 @@ export const getMessages = async (id: string): Promise<Messages> => {
         return [];
     }
 
-    const oldMessages = await prisma.message.findMany({
+    // Fetch all messages associated with the chat
+    const messages = await prisma.message.findMany({
         where: {
-            chatId: id,
+            chatId: chatId,
         },
         orderBy: {
-            createdAt: "asc",
+            createdAt: "asc", // Ensure messages are in chronological order
         },
     });
 
-    return oldMessages.map((msg) => ({
+    // Return messages in the expected format
+    return messages.map((msg) => ({
         id: msg.id,
         role: msg.role as "function" | "system" | "user" | "assistant",
         content: msg.content,
     }));
 };
 
+
 export const getChats = async () => {
     const { userId } = auth();
 
-    // Ensure userId is present and is a valid ObjectId (24 hex characters)
-    if (!userId || userId.length !== 24) return [];
+    if (!userId) return [];
 
     const chats = await prisma.chat.findMany({
         where: {
             userId: userId,
             Message: {
-                some: {
-                    id: {
-                        not: "", // Ensure no empty ID is being passed
-                    },
-                },
+                some: {},
             },
         },
         orderBy: {
@@ -77,7 +76,7 @@ export const createNewChat = async () => {
 
     // Ensure userId is valid
     if (!userId || userId.length !== 24) {
-        return { id: "" }; // Return early if the userId is not valid
+        return { id: "" };
     }
 
     // Find an old empty chat with the userId
