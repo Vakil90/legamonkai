@@ -36,7 +36,7 @@ const SettingsPage = async () => {
                 </div>
             </div>
             <footer className="text-slate-600 text-xs text-center pt-16">
-                LegalMonk AI @{new Date().getFullYear()}
+            Ottobotix @{new Date().getFullYear()}
             </footer>
         </div>
     );

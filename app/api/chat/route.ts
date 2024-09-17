@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { checkUserApiLlimit, increateApiLimit } from "@/lib/api-limit";
 import { checkSubscription } from "@/lib/subscription";
-
 import { Configuration, OpenAIApi } from "openai-edge";
 import { OpenAIStream, StreamingTextResponse } from "ai";
 
@@ -17,8 +16,8 @@ const openai = new OpenAIApi(config);
 
 interface Message {
     content: string;
-    role: "function" | "system" | "user" | "assistant"; // Adjust according to your needs
-    id: string; // If there are additional properties, include them here
+    role: "function" | "system" | "user" | "assistant";
+    id: string; 
 }
 
 export async function POST(req: Request) {
@@ -42,12 +41,16 @@ export async function POST(req: Request) {
             return new NextResponse("Invalid message format", { status: 400 });
         }
 
-        // Ensure the context is strictly about Indian law
         const legalContext = "In the context of Indian law, ";
-        const legalMessages = messages.map((message: Message) => ({
+        const instructionMessage = {
+            content: "Please respond directly to the user's queries regarding Indian law. Provide clear, concise, and specific answers with relevant examples or case references where applicable. Avoid generic statements.",
+            role: "system",
+            id: "instruction-1"
+        };        
+        const legalMessages = [instructionMessage, ...messages.map((message: Message) => ({
             ...message,
             content: legalContext + message.content,
-        }));
+        }))];
 
         const [freeTrial, isPro] = await Promise.all([checkUserApiLlimit(), checkSubscription()]);
 
@@ -94,7 +97,7 @@ export async function POST(req: Request) {
         }
 
         const response = await openai.createChatCompletion({
-            model: "gpt-4o", 
+            model: "gpt-4o",
             messages: legalMessages,
             stream: true,
         });
@@ -135,4 +138,3 @@ export async function POST(req: Request) {
         return new NextResponse("Internal Server Error", { status: 500 });
     }
 }
-

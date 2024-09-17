@@ -1,14 +1,14 @@
 export const planFeatures = {
     free: {
         features: [
-            "Access to our Vakil Basic model.",
+            "Access to our Monk Basic model.",
             "Generation is limited to 15.",
             "Basic features included.",
         ],
     },
     pro: {
         features: [
-            "Access to our Vakil Pro model.",
+            "Access to our Monk Pro model.",
             "Unlimited generations.",
             "Access to exclusive features like Plugins and all feature updations.",
         ],

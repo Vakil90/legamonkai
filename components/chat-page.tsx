@@ -1,18 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { SendHorizonal } from "lucide-react";
+import { SendHorizonal, Paperclip, PlusIcon } from "lucide-react";
 import TextareaAutosize from "react-textarea-autosize";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useRouter, useParams, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Empty from "@/components/empty";
 import Loader from "@/components/loader";
 import Message from "@/components/message";
 import { useProModal } from "@/hooks/use-pro-modal";
 import toast from "react-hot-toast";
 import { Message as MessageType, useChat } from "ai/react";
-import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 
 type initialMessages = {
@@ -29,8 +27,8 @@ const ChatPage = ({ initialMessages, chatId, error = false }: props) => {
 
     const proModal = useProModal();
 
-    const [isCode, setIsCode] = useState(pathname.includes("code"));
     const [isPromptEmpty, setIsPromptEmpty] = useState<boolean>(true);
+    const [file, setFile] = useState<File | null>(null);
 
     const bottomRef = useRef<HTMLDivElement | null>(null);
     const promptRef = useRef<HTMLTextAreaElement | null>(null);
@@ -38,13 +36,12 @@ const ChatPage = ({ initialMessages, chatId, error = false }: props) => {
     const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
         api: "/api/chat",
         body: {
-            chatId: chatId || "", // Ensure chatId is a string, default to an empty string if undefined
-            isCode: !!isCode, // Ensure isCode is a boolean
+            chatId: chatId || "",
+            file: file,
         },
         initialMessages: initialMessages || [],
         onError: (error: Error) => {
-            console.error("Error occurred:", error.message); // Log the error message to the console for debugging
-    
+            console.error("Error occurred:", error.message);
             if (error.message === "Free Trial Exhausted") {
                 proModal.open();
             } else {
@@ -60,14 +57,14 @@ const ChatPage = ({ initialMessages, chatId, error = false }: props) => {
         if (chatId && !pathname.includes(chatId)) {
             router.push(`/chat/${chatId}`);
         }
-    }, [chatId, pathname, router]); 
+    }, [chatId, pathname, router]);
 
     useEffect(() => {
         if (error) {
             toast.error("Uh oh! Unable to find chat.");
             router.push("/chat");
         }
-    }, [error, router]);    
+    }, [error, router]);
 
     const scrollToBottom = () => {
         window.scrollTo({
@@ -77,28 +74,29 @@ const ChatPage = ({ initialMessages, chatId, error = false }: props) => {
     };
 
     useEffect(() => {
-        if (messages[messages.length - 1]?.role === "user" || messages === initialMessages) {
+        if (messages.length > 0) {
             scrollToBottom();
         }
-    }, [messages, initialMessages]); 
+    }, [messages]);
 
-    // Manualy Handling the onChange of propt to style the submit button
     useEffect(() => {
-        if (input === "") {
-            setIsPromptEmpty(true);
-        } else {
-            setIsPromptEmpty(false);
-        }
+        setIsPromptEmpty(input === "");
     }, [input]);
 
-    // Function to submit form when Enter key is pressed and the Shift key is not held down (to allow for multiline input),
     const handleEnterKeyDown = (e: any) => {
         if (isLoading) {
             return;
         }
         if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault(); // Prevent the newline character from being added
-            handleSubmit(e); // Submit the form
+            e.preventDefault();
+            handleSubmit(e);
+        }
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = e.target.files?.[0];
+        if (selectedFile) {
+            setFile(selectedFile);
         }
     };
 
@@ -110,11 +108,11 @@ const ChatPage = ({ initialMessages, chatId, error = false }: props) => {
         <div className="flex flex-col h-full w-full items-center justify-between">
             <div className="w-full flex justify-between items-center px-4 py-2">
                 <h1 className="text-xl font-bold"></h1>
-                <Link href="/chat">
+                {/* <Link href="/chat">
                     <Button variant="outline" className="opacity-90">
                         <PlusIcon className="text-violet" size={16} /> &nbsp; New Chat
                     </Button>
-                </Link>
+                </Link> */}
             </div>
             {messages.length === 0 ? (
                 <Empty />
@@ -134,7 +132,21 @@ const ChatPage = ({ initialMessages, chatId, error = false }: props) => {
                     <form
                         onSubmit={handleSubmit}
                         onKeyDown={handleEnterKeyDown}
-                        className="rounded-sm absolute bottom-0 md:bottom-1 w-full ps-2 py-1 pe-1 md:ps-3 bg-slate-300 focus-within:shadow-sm flex gap-1">
+                        className="rounded-sm absolute bottom-0 md:bottom-1 w-full ps-2 py-1 pe-1 md:ps-3 bg-slate-300 focus-within:shadow-sm flex gap-1 items-center">
+                        <input
+                            type="file"
+                            id="file-input"
+                            onChange={handleFileChange}
+                            className="hidden"
+                        />
+                        <label htmlFor="file-input">
+                            <Button
+                                type="button"
+                                variant="link"
+                                className="p-2">
+                                <Paperclip className="text-slate-500" size={20} />
+                            </Button>
+                        </label>
                         <TextareaAutosize
                             ref={promptRef}
                             maxRows={10}
@@ -147,13 +159,9 @@ const ChatPage = ({ initialMessages, chatId, error = false }: props) => {
                             type="submit"
                             disabled={isPromptEmpty || isLoading}
                             variant="link"
-                            className={cn("mt-auto duration-500 w-10 h-10 p-2", {
-                                "bg-slate-800": !isPromptEmpty,
-                            })}>
+                            className="mt-auto duration-500 w-10 h-10 p-2 bg-slate-800">
                             <SendHorizonal
-                                className={cn("text-slate-500", {
-                                    "text-slate-300": !isPromptEmpty,
-                                })}
+                                className="text-slate-300"
                                 strokeWidth={1.5}
                             />
                         </Button>

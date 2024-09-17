@@ -39,7 +39,7 @@ const PlanDetails = ({ actionButtons = false, onSubscribe, loading = false }: Pl
             </div>
             <div className="md:w-1/2 md:p-2 md:ps-4  flex flex-col space-y-4 pb-6 md:pb-4">
                 <div className="flex justify-between text-lg font-bold">
-                    <h4>LegalMonk AI Pro</h4>{" "}
+                    <h4>Monk Pro</h4>{" "}
                     <span className="text-white">{MONTHLY_SUBSCRIPTION_FEE}</span>
                 </div>
                 {actionButtons && (

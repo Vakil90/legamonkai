@@ -12,7 +12,7 @@ const Plans = () => {
             </Card>
             <Link href="/sign-up">
                 <Button variant="primary" className="">
-                    Start your free trial today
+                    Start your Pro trial today
                 </Button>
             </Link>
         </div>
