@@ -14,7 +14,7 @@ const Chat = ({ chat }: { chat: Chat }) => {
 
     const handleMenu = (e: React.MouseEvent<SVGSVGElement>) => {
         e.stopPropagation();
-
+        console.log("Handle");
         setIsOpen((current) => !current);
     };
 
